@@ -24,6 +24,23 @@ func main() {
 	Start()
 }
 
+<<<<<<< HEAD
+=======
+var Welcome string = `Commands:
+=================================
+🙋 单聊 👉 单独聊天
+📣 串聊 👉 带上下文聊天
+🔃 重置 👉 重置带上下文聊天
+💵 余额 👉 查询剩余额度
+🚀 帮助 👉 显示帮助信息
+🌈 模板 👉 内置的prompt
+🎨 图片 👉 根据prompt生成图片
+=================================
+🚜 例：@我发送 空 或 帮助 将返回此帮助信息
+💪 Power By https://github.com/eryajf/chatgpt-dingtalk
+`
+
+>>>>>>> parent of 71a464b (perf: 当使用prompt但内容为空时，直接返回prompt的内容 (#138))
 func Start() {
 	app := ship.Default()
 	app.Route("/").POST(func(c *ship.Context) error {
@@ -42,7 +59,7 @@ func Start() {
 		// TODO: 校验请求
 		if len(msgObj.Text.Content) == 1 || strings.TrimSpace(msgObj.Text.Content) == "帮助" {
 			// 欢迎信息
-			_, err := msgObj.ReplyToDingtalk(string(dingbot.MARKDOWN), Welcome)
+			_, err := msgObj.ReplyToDingtalk(string(dingbot.TEXT), Welcome)
 			if err != nil {
 				logger.Warning(fmt.Errorf("send message error: %v", err))
 				return ship.ErrBadRequest.New(fmt.Errorf("send message error: %v", err))
@@ -53,16 +70,7 @@ func Start() {
 			case strings.HasPrefix(strings.TrimSpace(msgObj.Text.Content), "#图片"):
 				return process.ImageGenerate(&msgObj)
 			default:
-				msgObj.Text.Content, err = process.GeneratePrompt(strings.TrimSpace(msgObj.Text.Content))
-				// err不为空：提示词之后没有文本 -> 直接返回提示词所代表的内容
-				if err != nil {
-					_, err = msgObj.ReplyToDingtalk(string(dingbot.TEXT), msgObj.Text.Content)
-					if err != nil {
-						logger.Warning(fmt.Errorf("send message error: %v", err))
-						return err
-					}
-					return nil
-				}
+				msgObj.Text.Content = process.GeneratePrompt(strings.TrimSpace(msgObj.Text.Content))
 				logger.Info(fmt.Sprintf("after generate prompt: %#v", msgObj.Text.Content))
 				return process.ProcessRequest(&msgObj)
 			}
