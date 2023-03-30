@@ -109,6 +109,8 @@ func Start() {
 		logger.Fatal("Server forced to shutdown:", err)
 	}
 	logger.Info("Server exiting!")
+	// 启动服务器
+	ship.StartServer(":8090", app)
 }
 
 var Welcome string = `# 发送信息
